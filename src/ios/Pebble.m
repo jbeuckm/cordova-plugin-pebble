@@ -70,6 +70,22 @@
 }
 
 
+-(void)countConnectedWatches:(CDVInvokedUrlCommand *)command
+{
+    NSArray *connected = [[PBPebbleCentral defaultCentral] connectedWatches];
+
+            NSDictionary *resultDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                    [NSString stringWithFormat:@"%li", (int)connected.count], @"count",
+                    nil];
+
+          CDVPluginResult *pluginResult = [ CDVPluginResult
+                                           resultWithStatus    : CDVCommandStatus_OK
+                                           messageAsDictionary : resultDict
+                                           ];
+
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 
 -(void)launchApp:(CDVInvokedUrlCommand *)command
 {
