@@ -13,7 +13,7 @@
         This plugin bla bla bla
     </info>
 
-    <js-module src="www/pgpebble.js" name="Pebble">
+    <js-module src="www/cordova_plugin_pebble.js" name="Pebble">
         <clobbers target="navigator.Pebble" />
     </js-module>
 
