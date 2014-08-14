@@ -2,7 +2,6 @@ var Pebble = {
 
     setAppUUID: function(uuid, connectCallback, disconnectCallback) {
 
-        // Ask cordova to execute a method on our FileWriter class
         cordova.exec(
             connectCallback,
             disconnectCallback,
@@ -37,13 +36,37 @@ var Pebble = {
 
     launchApp: function(success, failure) {
 
-        // Ask cordova to execute a method on our FileWriter class
         cordova.exec(
             success,
             failure,
             'Pebble',
             'launchApp',
             [ ]
+        );
+
+    },
+
+
+    sendMessage: function(key, message, connectCallback, disconnectCallback) {
+
+        cordova.exec(
+            connectCallback,
+            disconnectCallback,
+            'Pebble',
+            'sendMessage',
+            [ key, message ]
+        );
+
+    },
+
+    sendImage: function(key, base64Data, connectCallback, disconnectCallback) {
+
+        cordova.exec(
+            connectCallback,
+            disconnectCallback,
+            'Pebble',
+            'sendImage',
+            [ key, base64Data ]
         );
 
     }

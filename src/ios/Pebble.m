@@ -82,7 +82,7 @@
     NSArray *connected = [[PBPebbleCentral defaultCentral] connectedWatches];
 
             NSDictionary *resultDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                    [NSString stringWithFormat:@"%i", (int)connected.count], @"count",
+                    [NSNumber numberWithInt:(int)connected.count], @"count",
                     nil];
 
           CDVPluginResult *pluginResult = [ CDVPluginResult
@@ -141,11 +141,106 @@
 }
 
 
+-(void)sendMessage:(CDVInvokedUrlCommand *)command
+{
+    if (![self checkWatchConnected]) return;
+
+    NSLog(@"Pebble sendMessage()");
+
+    NSNumber *key = [command.arguments objectAtIndex:0];
+    NSString *message = [command.arguments objectAtIndex:1];
+    NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys: message, key, nil];
+
+    NSLog(@"[INFO] %@", update);
+
+    [connectedWatch appMessagesPushUpdate:update onSent:^(PBWatch *watch, NSDictionary *update, NSError *error) {
+        if (!error) {
+            NSLog(@"Pebble: Successfully sent message.");
+          NSDictionary *jsonObj = [ [NSDictionary alloc]
+                                   initWithObjectsAndKeys :
+                                   @"true", @"success",
+                                   nil
+                                   ];
+
+          CDVPluginResult *pluginResult = [ CDVPluginResult
+                                           resultWithStatus    : CDVCommandStatus_OK
+                                           messageAsDictionary : jsonObj
+                                           ];
+
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];        }
+
+        else {
+            NSLog(@"Pebble: Error sending message: %@", error);
+          NSDictionary *jsonObj = [ [NSDictionary alloc]
+                                   initWithObjectsAndKeys :
+                                   @"false", @"success",
+                                   nil
+                                   ];
+
+          CDVPluginResult *pluginResult = [ CDVPluginResult
+                                           resultWithStatus    : CDVCommandStatus_ERROR
+                                           messageAsDictionary : jsonObj
+                                           ];
+
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }
+
+    }];
+
+}
+
+
+
+
+-(void)sendImage:(CDVInvokedUrlCommand *)command
+{
+    if (![self checkWatchConnected]) return;
+
+    NSLog(@"Pebble sendImage()");
+
+    NSNumber *key = [command.arguments objectAtIndex:0];
+
+    NSString *base64String = [command.arguments objectAtIndex:1];
+    NSData *data = [[NSData alloc] initWithBase64EncodedString:base64String options:0];
+    UIImage *image = [UIImage imageWithData:data];
+
+    [self sendImageToPebble:image withKey: key];
+
+    NSLog(@"Pebble: back from sendImageToPebble");
+}
+
+#define MAX_OUTGOING_SIZE 95
+
+-(void)sendImageToPebble:(UIImage*)image withKey:(id)key {
+
+    uint8_t width = image.size.width;
+    uint8_t height = image.size.height;
+    NSLog(@"Pebble: sending image size %d x %d", width, height);
+
+    PBBitmap* pbBitmap = [PBBitmap pebbleBitmapWithUIImage:image];
+    size_t length = [pbBitmap.pixelData length];
+    uint8_t j = 0;
+    NSLog(@"length of the pixelData: %zu", length);
+    for(size_t i = 0; i < length; i += MAX_OUTGOING_SIZE-3) {
+        NSMutableData *outgoing = [[NSMutableData alloc] initWithCapacity:MAX_OUTGOING_SIZE];
+        [outgoing appendBytes:&j length:1];
+        [outgoing appendBytes:&width length:1];
+        [outgoing appendBytes:&height length:1];
+        [outgoing appendData:[pbBitmap.pixelData subdataWithRange:NSMakeRange(i, MIN(MAX_OUTGOING_SIZE-3, length - i))]];
+        //enqueue ex: https://github.com/Katharine/peapod/
+        [pebbleDataQueue enqueue:@{key: outgoing}];
+        ++j;
+        NSLog(@" --enqueued %lu bytes", MIN(MAX_OUTGOING_SIZE-3, length - i));
+    }
+}
+
+
+
 -(BOOL)checkWatchConnected
 {
     if (connectedWatch == nil) {
 
-        NSLog(@"[ERROR] No Pebble watch connected.");
+        NSLog(@"Pebble: No watch connected.");
 
         return FALSE;
     }
@@ -154,11 +249,14 @@
     }
 }
 
+
+#pragma mark utils
+
 - (void)listenToConnectedWatch
 {
     if (connectedWatch) {
         [connectedWatch appMessagesAddReceiveUpdateHandler:^BOOL(PBWatch *watch, NSDictionary *update) {
-            NSLog(@"[INFO] Received message: %@", update);
+            NSLog(@"Pebble: received message: %@", update);
 //            [self fireEvent:@"update" withObject:@{ @"message": update[MESSAGE_KEY] }];
 
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:1];
@@ -176,13 +274,12 @@
         }];
     }
     else {
-        NSLog(@"[ERROR] Will not listen for messages: no watch connected.");
+        NSLog(@"Pebble: Will not listen for messages: no watch connected.");
     }
 }
 
 - (void)pluginInitialize
 {
-  NSLog(@"pebble init");
 
     [[PBPebbleCentral defaultCentral] setDelegate:self];
 
