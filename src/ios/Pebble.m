@@ -10,9 +10,12 @@
 
 @implementation Pebble
 
+@synthesize connectCallbackId;
 
 -(void)setAppUUID:(CDVInvokedUrlCommand *)command
 {
+    self.connectCallbackId = command.callbackId;
+
     NSString *uuidString = [command.arguments objectAtIndex:0];
 
     NSLog(@"PGPebble setAppUUID() with %@", uuidString);
@@ -36,7 +39,6 @@
                                      messageAsDictionary : jsonObj
                                      ];
 
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 
@@ -74,7 +76,7 @@
                                    ];
 
           CDVPluginResult *pluginResult = [ CDVPluginResult
-                                           resultWithStatus    : CDVCommandStatus_OK
+                                           resultWithStatus    : CDVCommandStatus_ERROR
                                            messageAsDictionary : jsonObj
                                            ];
 
@@ -123,7 +125,15 @@
     NSLog(@"Pebble connected: %@", [watch name]);
     connectedWatch = watch;
 
-    NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:[watch name],@"name",nil];
+    NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:1];
+    [returnInfo setObject:[watch name] forKey:@"name"];
+
+    // Build a resultset for javascript callback.
+    CDVPluginResult* result = nil;
+
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
+
+    [self.commandDelegate sendPluginResult:result callbackId:self.connectCallbackId];
 }
 
 - (void)pebbleCentral:(PBPebbleCentral*)central watchDidDisconnect:(PBWatch*)watch {
@@ -133,7 +143,15 @@
         connectedWatch = nil;
     }
 
-    NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:[watch name],@"name",nil];
+    NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:1];
+    [returnInfo setObject:[watch name] forKey:@"name"];
+
+    // Build a resultset for javascript callback.
+    CDVPluginResult* result = nil;
+
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:returnInfo];
+
+    [self.commandDelegate sendPluginResult:result callbackId:self.connectCallbackId];
 }
 
 

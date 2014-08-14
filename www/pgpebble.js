@@ -1,11 +1,11 @@
 var Pebble = {
 
-    setAppUUID: function(uuid, success, failure) {
+    setAppUUID: function(uuid, connectCallback, disconnectCallback) {
 
         // Ask cordova to execute a method on our FileWriter class
         cordova.exec(
-            success,
-            failure,
+            connectCallback,
+            disconnectCallback,
             'Pebble',
             'setAppUUID',
             [ uuid ]
