@@ -101,8 +101,9 @@
 }
 
 
--(void)startup:(CDVInvokedUrlCommand *)command
+- (void)pluginInitialize
 {
+  NSLog(@"pebble init");
 
     [[PBPebbleCentral defaultCentral] setDelegate:self];
 
