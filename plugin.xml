@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:rim="http://www.blackberry.com/ns/widgets"
+        id="org.beuckman.pgpebble"
+        version="0.0.1">
+
+    <name>Pebble</name>
+    <description>PhoneGap plugin to implement the Pebble SDK</description>
+    <author>Joe Beuckman</author>
+
+    <info>
+        This plugin bla bla bla
+    </info>
+
+    <js-module src="www/pgpebble.js" name="Pebble">
+        <clobbers target="navigator.Pebble" />
+    </js-module>
+
+    <engines>
+        <engine name="cordova" version=">=3.1.0" />
+    </engines>
+
+    <platform name="ios">
+
+        <!-- config file -->
+        <config-file target="config.xml" parent="/*">
+            <feature name="Pebble">
+                <param name="ios-package" value="Pebble" />
+            </feature>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="UISupportedExternalAccessoryProtocols">
+            <array>
+                <string>com.getpebble.public</string>
+            </array>
+        </config-file>
+
+
+        <header-file src="src/ios/Pebble.h" />
+        <source-file src="src/ios/Pebble.m" />
+
+        <header-file src="src/ios/KBPebbleMessageQueue.h" />
+        <source-file src="src/ios/KBPebbleMessageQueue.m" />
+
+        <framework src="ExternalAccessory.framework" />
+        <framework src="libz.dylib" />
+        <framework src="CoreBluetooth.framework" />
+        <framework src="CoreMotion.framework" />
+        <framework src="CFNetwork.framework" />
+        <framework src="MessageUI.framework" />
+
+        <framework src="src/ios/PebbleKit.framework" custom="true"/>
+        <framework src="src/ios/PebbleVendor.framework" custom="true"/>
+
+    </platform>
+
+</plugin>
