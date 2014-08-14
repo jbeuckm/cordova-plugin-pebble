@@ -26,20 +26,49 @@
     NSLog(@"%@", myAppUUID);
 
     [[PBPebbleCentral defaultCentral] setAppUUID:[NSData dataWithBytes:myAppUUIDbytes length:16]];
+}
 
-    NSDictionary *jsonObj = [ [NSDictionary alloc]
-                             initWithObjectsAndKeys :
-                             uuidString, @"uuid",
-                             @"true", @"success",
-                             nil
-                             ];
 
+-(void)getVersionInfo:(CDVInvokedUrlCommand *)command
+{
+    if (![self checkWatchConnected]) return;
+
+    NSLog(@"Pebble getVersionInfo()");
+
+    [connectedWatch getVersionInfo:^(PBWatch *watch, PBVersionInfo *versionInfo ) {
+
+        NSLog(@"Pebble firmware os version: %li", (long)versionInfo.runningFirmwareMetadata.version.os);
+        NSLog(@"Pebble firmware major version: %li", (long)versionInfo.runningFirmwareMetadata.version.major);
+        NSLog(@"Pebble firmware minor version: %li", (long)versionInfo.runningFirmwareMetadata.version.minor);
+        NSLog(@"Pebble firmware suffix version: %@", versionInfo.runningFirmwareMetadata.version.suffix);
+
+            NSDictionary *versionInfoDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                    [NSString stringWithFormat:@"%li", (long)versionInfo.runningFirmwareMetadata.version.os], @"os",
+                    [NSString stringWithFormat:@"%li", (long)versionInfo.runningFirmwareMetadata.version.major], @"major",
+                    [NSString stringWithFormat:@"%li", (long)versionInfo.runningFirmwareMetadata.version.minor], @"minor",
+                    versionInfo.runningFirmwareMetadata.version.suffix, @"suffix",
+                    nil];
+
+          CDVPluginResult *pluginResult = [ CDVPluginResult
+                                           resultWithStatus    : CDVCommandStatus_OK
+                                           messageAsDictionary : versionInfoDict
+                                           ];
+
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
+    }
+            onTimeout:^(PBWatch *watch) {
+                NSLog(@"[INFO] Timed out trying to get version info from Pebble.");
     CDVPluginResult *pluginResult = [ CDVPluginResult
-                                     resultWithStatus    : CDVCommandStatus_OK
-                                     messageAsDictionary : jsonObj
+                                     resultWithStatus    : CDVCommandStatus_ERROR
                                      ];
 
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }
+     ];
+
 }
+
 
 
 -(void)launchApp:(CDVInvokedUrlCommand *)command
@@ -132,6 +161,7 @@
     CDVPluginResult* result = nil;
 
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
+    [result setKeepCallbackAsBool:YES];
 
     [self.commandDelegate sendPluginResult:result callbackId:self.connectCallbackId];
 }
@@ -150,6 +180,7 @@
     CDVPluginResult* result = nil;
 
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:returnInfo];
+    [result setKeepCallbackAsBool:YES];
 
     [self.commandDelegate sendPluginResult:result callbackId:self.connectCallbackId];
 }

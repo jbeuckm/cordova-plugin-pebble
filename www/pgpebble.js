@@ -24,6 +24,17 @@ var Pebble = {
             [ ]
         );
 
+    },
+
+    getVersionInfo: function(success, failure) {
+
+        cordova.exec(
+            success,
+            failure,
+            'Pebble',
+            'getVersionInfo',
+            []
+        );
     }
 
 };
