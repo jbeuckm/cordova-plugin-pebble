@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:rim="http://www.blackberry.com/ns/widgets"
         id="org.beuckman.pgpebble"
-        version="0.0.1">
+        version="0.0.0">
 
     <name>Pebble</name>
     <description>PhoneGap plugin to implement the Pebble SDK</description>

@@ -11,6 +11,19 @@ var Pebble = {
             [ uuid ]
         );
 
+    },
+
+    launchApp: function(success, failure) {
+
+        // Ask cordova to execute a method on our FileWriter class
+        cordova.exec(
+            success,
+            failure,
+            'Pebble',
+            'launchApp',
+            [ ]
+        );
+
     }
 
 };

@@ -8,11 +8,12 @@
 
 #import <Cordova/CDVPlugin.h>
 #import <PebbleKit/PebbleKit.h>
+#import "KBPebbleMessageQueue.h"
 
-
-@interface Pebble : CDVPlugin
+@interface Pebble : CDVPlugin <PBPebbleCentralDelegate>
 {
     PBWatch *connectedWatch;
+    KBPebbleMessageQueue *pebbleDataQueue;
 }
 
 // This will return the file contents in a JSON object via the getFileContents utility method
