@@ -45,6 +45,17 @@ var Pebble = {
         );
 
     },
+    killApp: function(success, failure) {
+
+        cordova.exec(
+            success,
+            failure,
+            'Pebble',
+            'killApp',
+            [ ]
+        );
+
+    },
 
 
     sendMessage: function(key, message, connectCallback, disconnectCallback) {

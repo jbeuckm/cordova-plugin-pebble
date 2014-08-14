@@ -98,8 +98,6 @@
 {
     if (![self checkWatchConnected]) return;
 
-    @synchronized(connectedWatch){
-
     NSLog(@"Pebble launchApp()");
 
     [connectedWatch appMessagesLaunch:^(PBWatch *watch, NSError *error) {
@@ -137,8 +135,51 @@
         }
     }];
 
-    }
 }
+
+-(void)killApp:(CDVInvokedUrlCommand *)command
+{
+    if (![self checkWatchConnected]) return;
+
+    NSLog(@"Pebble killApp()");
+
+    [connectedWatch appMessagesKill:^(PBWatch *watch, NSError *error) {
+        if (!error) {
+          NSDictionary *jsonObj = [ [NSDictionary alloc]
+                                   initWithObjectsAndKeys :
+                                   @"true", @"success",
+                                   nil
+                                   ];
+
+          CDVPluginResult *pluginResult = [ CDVPluginResult
+                                           resultWithStatus    : CDVCommandStatus_OK
+                                           messageAsDictionary : jsonObj
+                                           ];
+
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
+        }
+        else {
+            NSLog(@"error killing Pebble app");
+
+          NSDictionary *jsonObj = [ [NSDictionary alloc]
+                                   initWithObjectsAndKeys :
+                                   @"false", @"success",
+                                   nil
+                                   ];
+
+          CDVPluginResult *pluginResult = [ CDVPluginResult
+                                           resultWithStatus    : CDVCommandStatus_ERROR
+                                           messageAsDictionary : jsonObj
+                                           ];
+
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
+        }
+    }];
+
+}
+
 
 
 -(void)sendMessage:(CDVInvokedUrlCommand *)command
