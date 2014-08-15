@@ -192,7 +192,7 @@
     NSString *message = [command.arguments objectAtIndex:1];
     NSDictionary *update = [NSDictionary dictionaryWithObjectsAndKeys: message, key, nil];
 
-    NSLog(@"[INFO] %@", update);
+    NSLog(@"Pebble SDK will send update %@", update);
 
     [connectedWatch appMessagesPushUpdate:update onSent:^(PBWatch *watch, NSDictionary *update, NSError *error) {
         if (!error) {

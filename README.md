@@ -48,7 +48,19 @@ window.plugins.Pebble.launchApp(
 );
 ```
 
-Receive messages from your app:
+Send a message to the watch:
+```javascript
+window.plugins.Pebble.sendMessage(1, "hello",
+    function(message){
+        console.log('success');
+    },
+    function(err){
+        alert(err);
+    }
+);
+```
+
+Receive messages from the watch:
 ```javascript
 window.plugins.Pebble.listenForMessages(function(message){
     alert('message');
