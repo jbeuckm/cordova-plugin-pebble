@@ -11,6 +11,7 @@
 @implementation Pebble
 
 @synthesize connectCallbackId;
+@synthesize messageCallbackId;
 
 -(void)setAppUUID:(CDVInvokedUrlCommand *)command
 {
@@ -31,10 +32,16 @@
     if (connected.count > 0) {
         NSLog(@"Pebble watch found at startup");
         connectedWatch = [connected objectAtIndex:0];
+        pebbleDataQueue.watch = connectedWatch;
     }
     [self listenToConnectedWatch];
 }
 
+
+-(void)listenForMessages:(CDVInvokedUrlCommand *)command
+{
+    self.messageCallbackId = command.callbackId;
+}
 
 -(void)getVersionInfo:(CDVInvokedUrlCommand *)command
 {
@@ -298,18 +305,16 @@
     if (connectedWatch) {
         [connectedWatch appMessagesAddReceiveUpdateHandler:^BOOL(PBWatch *watch, NSDictionary *update) {
             NSLog(@"Pebble: received message: %@", update);
-//            [self fireEvent:@"update" withObject:@{ @"message": update[MESSAGE_KEY] }];
 
-    NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:1];
-    [returnInfo setObject:[connectedWatch name] forKey:@"name"];
+            NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithDictionary:update];
 
-    // Build a resultset for javascript callback.
-    CDVPluginResult* result = nil;
+            [returnInfo setObject:[watch name] forKey:@"watch"];
 
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
-    [result setKeepCallbackAsBool:YES];
+            CDVPluginResult* result = nil;
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
+            [result setKeepCallbackAsBool:YES];
 
-    [self.commandDelegate sendPluginResult:result callbackId:self.connectCallbackId];
+            [self.commandDelegate sendPluginResult:result callbackId:self.messageCallbackId];
 
             return YES;
         }];
@@ -324,16 +329,7 @@
 
     [[PBPebbleCentral defaultCentral] setDelegate:self];
 
-    /*
-    connectedWatch = [[PBPebbleCentral defaultCentral] lastConnectedWatch];
-    [connectedWatch appMessagesAddReceiveUpdateHandler:^BOOL(PBWatch *watch, NSDictionary *update) {
-        NSLog(@"Received message: %@", update);
-        return YES;
-    }];
-    */
-
     pebbleDataQueue = [[KBPebbleMessageQueue alloc] init];
-    pebbleDataQueue.watch = connectedWatch;
 }
 
 #pragma mark delegate methods
@@ -341,6 +337,8 @@
 - (void)pebbleCentral:(PBPebbleCentral*)central watchDidConnect:(PBWatch*)watch isNew:(BOOL)isNew {
     NSLog(@"Pebble connected: %@", [watch name]);
     connectedWatch = watch;
+    pebbleDataQueue.watch = connectedWatch;
+
     [self listenToConnectedWatch];
 
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:1];

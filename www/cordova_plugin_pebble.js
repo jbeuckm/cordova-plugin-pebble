@@ -41,7 +41,7 @@ var Pebble = {
             failure,
             'Pebble',
             'launchApp',
-            [ ]
+            []
         );
 
     },
@@ -52,7 +52,7 @@ var Pebble = {
             failure,
             'Pebble',
             'killApp',
-            [ ]
+            []
         );
 
     },
@@ -68,6 +68,16 @@ var Pebble = {
             [ key, message ]
         );
 
+    },
+
+    listenForMessages: function(messageCallback, errorCallback) {
+        cordova.exec(
+            messageCallback,
+            errorCallback,
+            'Pebble',
+            'listenForMessages',
+            []
+        );
     },
 
     sendImage: function(key, base64Data, connectCallback, disconnectCallback) {

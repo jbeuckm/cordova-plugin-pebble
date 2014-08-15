@@ -17,8 +17,6 @@
 }
 
 @property (nonatomic, strong) NSString* connectCallbackId;
-
-// This will return the file contents in a JSON object via the getFileContents utility method
-- (void) setAppUUID:(CDVInvokedUrlCommand *)command;
+@property (nonatomic, strong) NSString* messageCallbackId;
 
 @end
