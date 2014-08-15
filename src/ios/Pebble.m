@@ -1,10 +1,3 @@
-//
-//  Pebble.m
-//  PGPebble
-//
-//  Created by Major Innovator on 8/13/14.
-//
-//
 
 #import "Pebble.h"
 
@@ -306,9 +299,12 @@
         [connectedWatch appMessagesAddReceiveUpdateHandler:^BOOL(PBWatch *watch, NSDictionary *update) {
             NSLog(@"Pebble: received message: %@", update);
 
-            NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithDictionary:update];
-
+            NSMutableDictionary* returnInfo = [[NSMutableDictionary alloc] init];
             [returnInfo setObject:[watch name] forKey:@"watch"];
+
+            for (NSNumber *key in update) {
+                [returnInfo setObject:[update objectForKey:key] forKey:[key stringValue]];
+            }
 
             CDVPluginResult* result = nil;
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];

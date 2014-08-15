@@ -1,10 +1,3 @@
-//
-//  Pebble.h
-//  PGPebble
-//
-//  Created by Major Innovator on 8/13/14.
-//
-//
 
 #import <Cordova/CDVPlugin.h>
 #import <PebbleKit/PebbleKit.h>

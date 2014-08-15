@@ -9,9 +9,7 @@
     <description>PhoneGap plugin to implement the Pebble SDK</description>
     <author>Joe Beuckman</author>
 
-    <info>
-        This plugin bla bla bla
-    </info>
+    <info>Interface to the Pebble SDK now available at window.plugins.Pebble</info>
 
     <js-module src="www/cordova_plugin_pebble.js" name="Pebble">
         <clobbers target="window.plugins.Pebble" />

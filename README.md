@@ -48,3 +48,23 @@ window.plugins.Pebble.launchApp(
 );
 ```
 
+Receive messages from your app:
+```javascript
+window.plugins.Pebble.listenForMessages(function(message){
+    alert('message');
+});
+```
+
+Kill your app:
+
+```javascript
+window.plugins.Pebble.killApp(
+    function(result){
+        console.log(result);
+    },
+    function(err){
+        alert(err);
+    }
+);
+```
+
