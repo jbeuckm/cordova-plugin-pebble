@@ -7,7 +7,7 @@ Implementation of the Pebble SDK for Cordova.
 
 From your project's root, add the plugin:
 
-```cordova plugin add git@github.com:jbeuckm/cordova-plugin-pebble.git```
+```cordova plugin add https://github.com/jbeuckm/cordova-plugin-pebble.git```
 
 Set the UUID of your companion app, and register callbacks for connect/disconnect events from watches:
 
